@@ -291,8 +291,8 @@ func isNilOrZero(v reflect.Value, t reflect.Type) bool {
 	}
 }
 
-// Interface for delegating copy process to type
-type Interface interface {
+// copier for delegating copy process to type
+type copier interface {
 	DeepCopy() interface{}
 }
 
@@ -325,9 +325,9 @@ func Copy(src interface{}) interface{} {
 // copyRecursive does the actual copying of the interface. It currently has
 // limited support for what it can handle. Add as needed.
 func copyRecursive(original, cpy reflect.Value) {
-	// check for implement deepcopy.Interface
+	// check for implement deepcopy.copier
 	if original.CanInterface() {
-		if copier, ok := original.Interface().(Interface); ok {
+		if copier, ok := original.Interface().(copier); ok {
 			cpy.Set(reflect.ValueOf(copier.DeepCopy()))
 			return
 		}

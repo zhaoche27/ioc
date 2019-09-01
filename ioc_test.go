@@ -36,7 +36,7 @@ func (o Order) String() string {
 	return fmt.Sprint(o.P, o.U)
 }
 
-func Test_guice(t *testing.T) {
+func Test_ioc(t *testing.T) {
 	inject := &Inject{}
 	err := inject.ProvideByName("u", User{})
 	if err != nil {
