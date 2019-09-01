@@ -294,7 +294,7 @@ func isNilOrZero(v reflect.Value, t reflect.Type) bool {
 
 // copier for delegating copy process to type
 type copier interface {
-	DeepCopy() interface{}
+	Copy() interface{}
 }
 
 // Iface is an alias to Copy; this exists for backwards compatibility reasons.
@@ -321,7 +321,7 @@ func copyRecursive(original, cpy reflect.Value) {
 	// check for implement deepcopy.copier
 	if original.CanInterface() {
 		if copier, ok := original.Interface().(copier); ok {
-			cpy.Set(reflect.ValueOf(copier.DeepCopy()))
+			cpy.Set(reflect.ValueOf(copier.Copy()))
 			return
 		}
 	}
@@ -360,7 +360,7 @@ func copyRecursive(original, cpy reflect.Value) {
 		}
 		// Go through each field of the struct and copy it.
 		for i := 0; i < original.NumField(); i++ {
-			if original.Field(i).CanSet() {
+			if !original.Field(i).CanSet() {
 				continue
 			}
 			copyRecursive(original.Field(i), cpy.Field(i))

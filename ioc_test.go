@@ -20,7 +20,7 @@ func (p *Product) String() string {
 	return fmt.Sprintf("=====%T,%p", p, p)
 }
 
-func (o *Product) DeepCopy() interface{} {
+func (o *Product) Copy() interface{} {
 	fmt.Printf("-----------------------%p\n", o)
 	p := &Product{}
 	fmt.Printf("-----------------------%p\n", p)
@@ -63,8 +63,10 @@ func Test_ioc(t *testing.T) {
 		t.Error(err)
 		return
 	}
+	t.Log("============================================")
 	order = o.(*Order)
 	t.Logf("%p", order)
 	t.Logf("%v", order.U)
 	t.Logf("%p", order.P)
+	t.Log(order)
 }
