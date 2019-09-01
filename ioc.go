@@ -239,7 +239,8 @@ func (inject *Inject) populateExplicit(o *Object) error {
 				return err
 			}
 			newValue := reflect.New(fieldType.Elem()).Interface()
-			oFiled := &Object{value: newValue, reflectType: fieldType, reflectValue: reflect.ValueOf(newValue), embedded: field.Anonymous}
+			oFiled := &Object{value: newValue, reflectType: fieldType, reflectValue: reflect.ValueOf(newValue),
+				embedded: field.Anonymous}
 			err := inject.populateExplicit(oFiled)
 			if err != nil {
 				return err
@@ -308,17 +309,9 @@ func Copy(src interface{}) interface{} {
 	if src == nil {
 		return nil
 	}
-
-	// Make the interface a reflect.value
 	original := reflect.ValueOf(src)
-
-	// Make a copy of the same type as the original.
 	cpy := reflect.New(original.Type()).Elem()
-
-	// Recursively copy the original.
 	copyRecursive(original, cpy)
-
-	// Return the copy as an interface.
 	return cpy.Interface()
 }
 
@@ -367,10 +360,7 @@ func copyRecursive(original, cpy reflect.Value) {
 		}
 		// Go through each field of the struct and copy it.
 		for i := 0; i < original.NumField(); i++ {
-			// The Type's StructField for a given field is checked to see if StructField.PkgPath
-			// is set to determine if the field is exported or not because CanSet() returns false
-			// for settable fields.  I'm not sure why.  -mohae
-			if original.Type().Field(i).PkgPath != "" {
+			if original.Field(i).CanSet() {
 				continue
 			}
 			copyRecursive(original.Field(i), cpy.Field(i))
