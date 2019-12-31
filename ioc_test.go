@@ -5,11 +5,12 @@ import (
 	"testing"
 )
 
-type User struct {
+type Name struct {
+	first, second string
 }
 
-func (u User) String() string {
-	return fmt.Sprintf("AAAAAAAA=%T", u)
+type User struct {
+	*Name `inject:""`
 }
 
 type Product struct {
@@ -28,17 +29,23 @@ func (o *Product) Copy() interface{} {
 }
 
 type Order struct {
-	U User         `inject:"u"`
-	P fmt.Stringer `inject:""`
+	*User `inject:""`
+	U     User         `inject:"u"`
+	P     fmt.Stringer `inject:""`
 }
 
 func (o Order) String() string {
-	return fmt.Sprint(o.P, o.U)
+	return fmt.Sprint(o.P, o.User)
 }
 
 func Test_ioc(t *testing.T) {
 	inject := &Inject{}
-	err := inject.ProvideByName("u", User{})
+	err := inject.Provide(&Name{first: "f", second: "s"})
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	err = inject.ProvideByName("u", User{})
 	if err != nil {
 		t.Error(err)
 		return

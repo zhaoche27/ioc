@@ -51,16 +51,10 @@ func (inject *Inject) provide(o *Object) error {
 		if inject.unnamed == nil {
 			inject.unnamed = make(map[reflect.Type]*Object)
 		}
-		if _, ok := inject.unnamed[o.reflectType]; ok {
-			return nil
-		}
 		inject.unnamed[o.reflectType] = o
 	} else {
 		if inject.named == nil {
 			inject.named = make(map[string]*Object)
-		}
-		if _, ok := inject.named[o.name]; ok {
-			return nil
 		}
 		inject.named[o.name] = o
 	}
@@ -232,8 +226,9 @@ func (inject *Inject) populateExplicit(o *Object) error {
 			if !isStructPtr(fieldType) {
 				err = fmt.Errorf(
 					"expected unnamed object value to be a pointer to a struct but got type %s "+
-						"with value %v",
+						"with field type %s value %v",
 					o.reflectType,
+					fieldType,
 					fieldValue.Interface(),
 				)
 				return err
@@ -285,10 +280,10 @@ func isStructPtr(t reflect.Type) bool {
 
 func isNilOrZero(v reflect.Value, t reflect.Type) bool {
 	switch v.Kind() {
-	default:
-		return reflect.DeepEqual(v.Interface(), reflect.Zero(t).Interface())
 	case reflect.Interface, reflect.Ptr:
 		return v.IsNil()
+	default:
+		return reflect.DeepEqual(v.Interface(), reflect.Zero(t).Interface())
 	}
 }
 
